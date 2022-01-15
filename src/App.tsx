@@ -38,6 +38,20 @@ const NFTRow = ({ id, owner, choose, meta }: { id: number, owner: string, choose
   <img src={meta.image} height={200} />
   <p>Id: {id} - owner: {owner}</p>
   <p><button onClick={choose}>bl3nd me</button></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Trait type</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      {meta.attributes.map((attr: any) => <tr>
+        <td>{attr.trait_type}</td>
+        <td>{attr.value}</td>
+      </tr>)}
+    </tbody>
+  </table>
 </>
 
 type ChosenNFT = { id: number, contract: Contract }
@@ -146,6 +160,8 @@ function App() {
     const owners = await Promise.all(baycIds.map((id) => (bayc || baycContract)!.ownerOf(id)))
     const meta = await getMeta(baycIds, baycBaseUri)
 
+    console.log(meta)
+
     setBaycOwners(owners)
     setBaycMeta(meta)
   }
@@ -153,6 +169,8 @@ function App() {
   const getDoodlesOwnersAndMeta = async (doodlesContract?: Contract) => {
     const owners = await Promise.all(doodlesIds.map((id) => (doodles || doodlesContract)!.ownerOf(id)))
     const meta = await getMeta(doodlesIds, doodlesBaseUri)
+
+    console.log(meta)
 
     setDoodlesOwners(owners)
     setDoodlesMeta(meta)
