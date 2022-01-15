@@ -6,7 +6,8 @@ import erc721Abi from './erc721.json'
 
 import './App.css';
 
-const nftFactoryAddress = '0xf44CD75f4613af17FFc4113070aE0D09e053382d'
+const nftFactoryAddress = '0x744568c5943a5d00d0c51ead20122631937B9715'
+const baycAddressStorageKey = 'bayc-address'
 
 declare global {
   interface Window { ethereum: any }
@@ -33,6 +34,11 @@ function App() {
 
       const nftFactoryContract = new Contract(nftFactoryAddress, nftFactoryAbi, signer)
       setNftFactory(nftFactoryContract)
+
+      const baycAddress = localStorage.getItem(baycAddressStorageKey)
+      if (baycAddress) {
+        setBayc(new Contract(baycAddress, erc721Abi, signer))
+      }
     })
   }
 
@@ -49,12 +55,12 @@ function App() {
 
     setBaycDeployTxSuccess(true)
 
-    const address = receipt.events![0].args!.contractAddress
+    const nftAddress = receipt.events!.find(e => e.address === nftFactoryAddress)!.args!.contractAddress
 
-    const baycContract = new Contract(address, erc721Abi, signer)
+    const baycContract = new Contract(nftAddress, erc721Abi, signer)
     setBayc(baycContract)
 
-    localStorage.setItem('bayc-address', address)
+    localStorage.setItem(baycAddressStorageKey, nftAddress)
   }
 
   return (
@@ -66,8 +72,9 @@ function App() {
       <div className='fusion'>
         <div className="column">
           <h3>BAYC NFT</h3>
-          <button onClick={deployBayc}>deploy</button>
+          <button onClick={deployBayc} disabled={!!bayc}>deploy</button>
           {baycDeployTx && <p>Tx: {baycDeployTx.hash}{baycDeployTxSuccess && ' success'}</p>}
+          <p>Address: {bayc && bayc.address}</p>
         </div>
         <div className="column">
           Fusion
