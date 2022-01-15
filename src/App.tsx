@@ -13,6 +13,7 @@ const bl3ndAddress = '0x3Ab5eDd57989ea705C44f3831A9Fb6e6677b0fB2'
 
 const baycAddressStorageKey = 'bayc-address'
 const doodlesAddressStorageKey = 'doodles-address'
+const blendsStorageKey = 'blends-ids'
 
 const baycIds = [
   3650, // https://opensea.io/assets/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/3650
@@ -46,7 +47,7 @@ const NFTRow = ({ id, owner, choose, meta }: { id: number, owner: string, choose
       </tr>
     </thead>
     <tbody>
-      {meta.attributes.map((attr: any) => <tr>
+      {meta && meta.attributes.map((attr: any) => <tr>
         <td>{attr.trait_type}</td>
         <td>{attr.value}</td>
       </tr>)}
@@ -60,6 +61,8 @@ const getMeta = (ids: number[], baseURI: string) => Promise.all(ids.map((id) => 
   data.image = data.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
   return data
 })))
+
+const getBlends = () => JSON.parse(localStorage.getItem(blendsStorageKey) || JSON.stringify([]))
 
 function App() {
   const [signer, setSigner] = useState<Signer>()
@@ -160,8 +163,6 @@ function App() {
     const owners = await Promise.all(baycIds.map((id) => (bayc || baycContract)!.ownerOf(id)))
     const meta = await getMeta(baycIds, baycBaseUri)
 
-    console.log(meta)
-
     setBaycOwners(owners)
     setBaycMeta(meta)
   }
@@ -169,8 +170,6 @@ function App() {
   const getDoodlesOwnersAndMeta = async (doodlesContract?: Contract) => {
     const owners = await Promise.all(doodlesIds.map((id) => (doodles || doodlesContract)!.ownerOf(id)))
     const meta = await getMeta(doodlesIds, doodlesBaseUri)
-
-    console.log(meta)
 
     setDoodlesOwners(owners)
     setDoodlesMeta(meta)
@@ -188,6 +187,9 @@ function App() {
     const { tokenId, to }: { tokenId: BigNumber, to: string } = receipt.events!.find(e => e.address === bl3ndAddress)!.args! as any
 
     console.log(tokenId, to)
+
+    const oldBlends = getBlends()
+    localStorage.setItem(blendsStorageKey, JSON.stringify([...oldBlends, tokenId.toHexString()]))
 
     setMintedTokenId(tokenId.toHexString())
     setMintedTokenOwner(to)
@@ -231,6 +233,12 @@ function App() {
           <p>Address: {doodles && doodles.address}</p>
           {doodles && doodlesIds.map((id, i) => <NFTRow key={id} id={id} owner={doodlesOwners[i]} choose={() => setNFT2({ id, contract: doodles! })} meta={doodlesMeta[i]} />)}
         </div>
+      </div>
+      <div>
+        <h3>Bl3nds</h3>
+        <ul>
+          {getBlends().map((blendTokenId: string) => <li key={blendTokenId}>{blendTokenId}</li>)}
+        </ul>
       </div>
     </div>
   );
