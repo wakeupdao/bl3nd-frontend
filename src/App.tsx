@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { Contract, ContractReceipt, ContractTransaction, providers, Signer } from 'ethers';
+import { BigNumber, Contract, ContractReceipt, ContractTransaction, providers, Signer } from 'ethers';
 
 import nftFactoryAbi from './nftFactory.json'
 import erc721Abi from './erc721.json'
+import bl3ndAbi from './bl3ndAbi.json'
 
 import './App.css';
 
 const nftFactoryAddress = '0x744568c5943a5d00d0c51ead20122631937B9715'
+const bl3ndAddress = '0x3Ab5eDd57989ea705C44f3831A9Fb6e6677b0fB2'
+
 const baycAddressStorageKey = 'bayc-address'
 const lootAddressStorageKey = 'loot-address'
 
@@ -26,14 +29,19 @@ declare global {
   interface Window { ethereum: any }
 }
 
-const NFTRow = ({ id, owner }: { id: number, owner: string }) =>  <p key={id}>Id: {id} - owner: {owner}</p>
+const NFTRow = ({ id, owner, choose }: { id: number, owner: string, choose: () => void }) => <>
+  <p>Id: {id} - owner: {owner}</p>
+  <button onClick={choose}>bl3nd me</button>
+</>
+
+type ChosenNFT = { id: number, contract: Contract }
 
 function App() {
   const [signer, setSigner] = useState<Signer>()
   const [account, setAccount] = useState('')
 
   const [nftFactory, setNftFactory] = useState<Contract>()
-  // const [bl3nd, setBl3nd] = useState<Contract>()
+  const [bl3nd, setBl3nd] = useState<Contract>()
 
   const [baycDeployTx, setBaycDeployTx] = useState<ContractTransaction>()
   const [baycDeployTxSuccess, setBaycDeployTxSuccess] = useState(false)
@@ -47,6 +55,14 @@ function App() {
 
   const [lootOwners, setLootOwners] = useState(['', '', ''])
 
+  const [nft1, setNFT1] = useState<ChosenNFT>()
+  const [nft2, setNFT2] = useState<ChosenNFT>()
+
+  const [blendTx, setBlendTx] = useState<ContractTransaction>()
+  const [blendTxSuccess, setBlendTxSuccess] = useState(false)
+  const [mintedTokenId, setMintedTokenId] = useState('')
+  const [mintedTokenOwner, setMintedTokenOwner] = useState('')
+
   const connect = async () => {
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
     setAccount(accounts[0])
@@ -57,6 +73,8 @@ function App() {
 
     const nftFactoryContract = new Contract(nftFactoryAddress, nftFactoryAbi, signer)
     setNftFactory(nftFactoryContract)
+
+    setBl3nd(new Contract(bl3ndAddress, bl3ndAbi, signer))
 
     const baycAddress = localStorage.getItem(baycAddressStorageKey)
     if (baycAddress) {
@@ -89,7 +107,7 @@ function App() {
 
     localStorage.setItem(baycAddressStorageKey, nftAddress)
 
-    await getBaycOwners()
+    await getBaycOwners(baycContract)
   }
 
   const deployLoot = async () => {
@@ -107,6 +125,8 @@ function App() {
     setLoot(lootContract)
 
     localStorage.setItem(lootAddressStorageKey, nftAddress)
+
+    await getLootOwners(lootContract)
   }
 
   const getBaycOwners = async (baycContract?: Contract) => {
@@ -117,6 +137,26 @@ function App() {
   const getLootOwners = async (lootContract?: Contract) => {
     const owners = await Promise.all(lootIds.map((id) => (loot || lootContract)!.ownerOf(id)))
     setLootOwners(owners)
+  }
+
+  const blend = async () => {
+    await nft1!.contract.approve(bl3nd!.address, nft1!.id).then((tx: ContractTransaction) => tx.wait())
+    await nft2!.contract.approve(bl3nd!.address, nft2!.id).then((tx: ContractTransaction) => tx.wait())
+    const tx: ContractTransaction = await bl3nd!.blend(nft1!.contract.address, nft1!.id, nft2!.contract.address, nft2!.id)
+    setBlendTx(tx)
+
+    const receipt = await tx.wait()
+    setBlendTxSuccess(true)
+
+    const { tokenId, to }: { tokenId: BigNumber, to: string } = receipt.events!.find(e => e.address === bl3ndAddress)!.args! as any
+
+    console.log(tokenId, to)
+
+    setMintedTokenId(tokenId.toHexString())
+    setMintedTokenOwner(to)
+
+    await getBaycOwners()
+    await getLootOwners()
   }
 
   return (
@@ -131,17 +171,28 @@ function App() {
           <button onClick={deployBayc} disabled={!!bayc}>deploy</button>
           {baycDeployTx && <p>Tx: {baycDeployTx.hash}{baycDeployTxSuccess && ' success'}</p>}
           <p>Address: {bayc && bayc.address}</p>
-          {baycIds.map((id, i) => <NFTRow id={id} owner={baycOwners[i]} />)}
+          {baycIds.map((id, i) => <NFTRow key={id} id={id} owner={baycOwners[i]} choose={() => setNFT1({ id, contract: bayc! })}/>)}
         </div>
         <div className="column">
-          Fusion
+          <h2>Bl3nder</h2>
+          <p>Address: {bl3ndAddress}</p>
+          <p>NFT 1: {nft1 && nft1.id}</p>
+          <p>NFT 2: {nft2 && nft2.id}</p>
+          <button disabled={!(nft1 && nft2)} onClick={blend}>Bl3nd!</button>
+          {
+            blendTx && <>
+              <p>{blendTx.hash}{blendTxSuccess && ' success! Token was minted'}</p>
+              <p>Token id: {mintedTokenId}</p>
+              <p>Token owner: {mintedTokenOwner}</p>
+            </>
+          }
         </div>
         <div className="column">
           <h3>Loot NFT</h3>
           <button onClick={deployLoot} disabled={!!loot}>deploy</button>
           {lootDeployTx && <p>Tx: {lootDeployTx.hash}{lootDeployTxSuccess && ' success'}</p>}
           <p>Address: {loot && loot.address}</p>
-          {lootIds.map((id, i) =>  <NFTRow id={id} owner={lootOwners[i]} />)}
+          {lootIds.map((id, i) => <NFTRow key={id} id={id} owner={lootOwners[i]} choose={() => setNFT2({ id, contract: loot! })} />)}
         </div>
       </div>
     </div>
