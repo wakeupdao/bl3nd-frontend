@@ -26,6 +26,8 @@ declare global {
   interface Window { ethereum: any }
 }
 
+const NFTRow = ({ id, owner }: { id: number, owner: string }) =>  <p key={id}>Id: {id} - owner: {owner}</p>
+
 function App() {
   const [signer, setSigner] = useState<Signer>()
   const [account, setAccount] = useState('')
@@ -129,7 +131,7 @@ function App() {
           <button onClick={deployBayc} disabled={!!bayc}>deploy</button>
           {baycDeployTx && <p>Tx: {baycDeployTx.hash}{baycDeployTxSuccess && ' success'}</p>}
           <p>Address: {bayc && bayc.address}</p>
-          {baycIds.map((id, i) => <p key={id}>Id: {id} - owner: {baycOwners[i]}</p>)}
+          {baycIds.map((id, i) => <NFTRow id={id} owner={baycOwners[i]} />)}
         </div>
         <div className="column">
           Fusion
@@ -139,7 +141,7 @@ function App() {
           <button onClick={deployLoot} disabled={!!loot}>deploy</button>
           {lootDeployTx && <p>Tx: {lootDeployTx.hash}{lootDeployTxSuccess && ' success'}</p>}
           <p>Address: {loot && loot.address}</p>
-          {lootIds.map((id, i) => <p key={id}>Id: {id} - owner: {lootOwners[i]}</p>)}
+          {lootIds.map((id, i) =>  <NFTRow id={id} owner={lootOwners[i]} />)}
         </div>
       </div>
     </div>
