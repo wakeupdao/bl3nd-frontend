@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BigNumber, Contract, ContractReceipt, ContractTransaction, providers, Signer } from 'ethers';
+import axios from 'axios'
 
 import nftFactoryAbi from './nftFactory.json'
 import erc721Abi from './erc721.json'
@@ -11,7 +12,7 @@ const nftFactoryAddress = '0x744568c5943a5d00d0c51ead20122631937B9715'
 const bl3ndAddress = '0x3Ab5eDd57989ea705C44f3831A9Fb6e6677b0fB2'
 
 const baycAddressStorageKey = 'bayc-address'
-const lootAddressStorageKey = 'loot-address'
+const doodlesAddressStorageKey = 'doodles-address'
 
 const baycIds = [
   3650, // https://opensea.io/assets/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/3650
@@ -19,22 +20,32 @@ const baycIds = [
   3368, // https://opensea.io/assets/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/3368
 ]
 
-const lootIds = [
-  5229, // https://opensea.io/assets/0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7/5229
-  5917, // https://opensea.io/assets/0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7/4671
-  1441, // https://opensea.io/assets/0xff9c1b15b16263c61d017ee9f65c50e4ae0113d7/3368
+const baycBaseUri = 'https://ipfs.io/ipfs/QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/'
+
+const doodlesIds = [
+  4889, // https://opensea.io/assets/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/4889
+  3701, // https://opensea.io/assets/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/3701
+  2952, // https://opensea.io/assets/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/2952
 ]
+
+const doodlesBaseUri = 'https://ipfs.io/ipfs/QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS/'
 
 declare global {
   interface Window { ethereum: any }
 }
 
-const NFTRow = ({ id, owner, choose }: { id: number, owner: string, choose: () => void }) => <>
+const NFTRow = ({ id, owner, choose, meta }: { id: number, owner: string, choose: () => void, meta: any }) => <>
+  <img src={meta.image} height={200} />
   <p>Id: {id} - owner: {owner}</p>
-  <button onClick={choose}>bl3nd me</button>
+  <p><button onClick={choose}>bl3nd me</button></p>
 </>
 
 type ChosenNFT = { id: number, contract: Contract }
+
+const getMeta = (ids: number[], baseURI: string) => Promise.all(ids.map((id) => axios.get(baseURI + id).then(res => res.data).then(data => {
+  data.image = data.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
+  return data
+})))
 
 function App() {
   const [signer, setSigner] = useState<Signer>()
@@ -48,12 +59,14 @@ function App() {
   const [bayc, setBayc] = useState<Contract>()
 
   const [baycOwners, setBaycOwners] = useState(['', '', ''])
+  const [baycMeta, setBaycMeta] = useState(['', '', ''])
 
-  const [lootDeployTx, setLootDeployTx] = useState<ContractTransaction>()
-  const [lootDeployTxSuccess, setLootDeployTxSuccess] = useState(false)
-  const [loot, setLoot] = useState<Contract>()
+  const [doodlesDeployTx, setDoodlesDeployTx] = useState<ContractTransaction>()
+  const [doodlesDeployTxSuccess, setDoodlesDeployTxSuccess] = useState(false)
+  const [doodles, setDoodles] = useState<Contract>()
 
-  const [lootOwners, setLootOwners] = useState(['', '', ''])
+  const [doodlesOwners, setDoodlesOwners] = useState(['', '', ''])
+  const [doodlesMeta, setDoodlesMeta] = useState(['', '', ''])
 
   const [nft1, setNFT1] = useState<ChosenNFT>()
   const [nft2, setNFT2] = useState<ChosenNFT>()
@@ -80,14 +93,14 @@ function App() {
     if (baycAddress) {
       const baycContract = new Contract(baycAddress, erc721Abi, signer)
       setBayc(baycContract)
-      await getBaycOwners(baycContract)
+      await getBaycOwnersAndMeta(baycContract)
     }
 
-    const lootAddress = localStorage.getItem(lootAddressStorageKey)
-    if (lootAddress) {
-      const lootContract = new Contract(lootAddress, erc721Abi, signer)
-      setLoot(lootContract)
-      await getLootOwners(lootContract)
+    const doodlesAddress = localStorage.getItem(doodlesAddressStorageKey)
+    if (doodlesAddress) {
+      const doodlesContract = new Contract(doodlesAddress, erc721Abi, signer)
+      setDoodles(doodlesContract)
+      await getDoodlesOwnersAndMeta(doodlesContract)
     }
   }
 
@@ -107,36 +120,42 @@ function App() {
 
     localStorage.setItem(baycAddressStorageKey, nftAddress)
 
-    await getBaycOwners(baycContract)
+    await getBaycOwnersAndMeta(baycContract)
   }
 
-  const deployLoot = async () => {
-    const tx = await nftFactory!.createNFT('Loot', 'LOOT', lootIds)
+  const deployDoodles = async () => {
+    const tx = await nftFactory!.createNFT('Doodles', 'DOODLE', doodlesIds)
 
-    setLootDeployTx(tx)
+    setDoodlesDeployTx(tx)
 
     const receipt: ContractReceipt = await tx.wait()
 
-    setLootDeployTxSuccess(true)
+    setDoodlesDeployTxSuccess(true)
 
     const nftAddress = receipt.events!.find(e => e.address === nftFactoryAddress)!.args!.contractAddress
 
-    const lootContract = new Contract(nftAddress, erc721Abi, signer)
-    setLoot(lootContract)
+    const doodlesContract = new Contract(nftAddress, erc721Abi, signer)
+    setDoodles(doodlesContract)
 
-    localStorage.setItem(lootAddressStorageKey, nftAddress)
+    localStorage.setItem(doodlesAddressStorageKey, nftAddress)
 
-    await getLootOwners(lootContract)
+    await getDoodlesOwnersAndMeta(doodlesContract)
   }
 
-  const getBaycOwners = async (baycContract?: Contract) => {
+  const getBaycOwnersAndMeta = async (baycContract?: Contract) => {
     const owners = await Promise.all(baycIds.map((id) => (bayc || baycContract)!.ownerOf(id)))
+    const meta = await getMeta(baycIds, baycBaseUri)
+
     setBaycOwners(owners)
+    setBaycMeta(meta)
   }
 
-  const getLootOwners = async (lootContract?: Contract) => {
-    const owners = await Promise.all(lootIds.map((id) => (loot || lootContract)!.ownerOf(id)))
-    setLootOwners(owners)
+  const getDoodlesOwnersAndMeta = async (doodlesContract?: Contract) => {
+    const owners = await Promise.all(doodlesIds.map((id) => (doodles || doodlesContract)!.ownerOf(id)))
+    const meta = await getMeta(doodlesIds, doodlesBaseUri)
+
+    setDoodlesOwners(owners)
+    setDoodlesMeta(meta)
   }
 
   const blend = async () => {
@@ -155,8 +174,8 @@ function App() {
     setMintedTokenId(tokenId.toHexString())
     setMintedTokenOwner(to)
 
-    await getBaycOwners()
-    await getLootOwners()
+    await getBaycOwnersAndMeta()
+    await getDoodlesOwnersAndMeta()
   }
 
   return (
@@ -171,7 +190,7 @@ function App() {
           <button onClick={deployBayc} disabled={!!bayc}>deploy</button>
           {baycDeployTx && <p>Tx: {baycDeployTx.hash}{baycDeployTxSuccess && ' success'}</p>}
           <p>Address: {bayc && bayc.address}</p>
-          {baycIds.map((id, i) => <NFTRow key={id} id={id} owner={baycOwners[i]} choose={() => setNFT1({ id, contract: bayc! })}/>)}
+          {bayc && baycIds.map((id, i) => <NFTRow key={id} id={id} owner={baycOwners[i]} choose={() => setNFT1({ id, contract: bayc! })} meta={baycMeta[i]} />)}
         </div>
         <div className="column">
           <h2>Bl3nder</h2>
@@ -188,11 +207,11 @@ function App() {
           }
         </div>
         <div className="column">
-          <h3>Loot NFT</h3>
-          <button onClick={deployLoot} disabled={!!loot}>deploy</button>
-          {lootDeployTx && <p>Tx: {lootDeployTx.hash}{lootDeployTxSuccess && ' success'}</p>}
-          <p>Address: {loot && loot.address}</p>
-          {lootIds.map((id, i) => <NFTRow key={id} id={id} owner={lootOwners[i]} choose={() => setNFT2({ id, contract: loot! })} />)}
+          <h3>Doodles NFT</h3>
+          <button onClick={deployDoodles} disabled={!!doodles}>deploy</button>
+          {doodlesDeployTx && <p>Tx: {doodlesDeployTx.hash}{doodlesDeployTxSuccess && ' success'}</p>}
+          <p>Address: {doodles && doodles.address}</p>
+          {doodles && doodlesIds.map((id, i) => <NFTRow key={id} id={id} owner={doodlesOwners[i]} choose={() => setNFT2({ id, contract: doodles! })} meta={doodlesMeta[i]} />)}
         </div>
       </div>
     </div>
