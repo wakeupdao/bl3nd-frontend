@@ -1,24 +1,42 @@
-import React from 'react';
-import logo from './logo.svg';
+import { providers } from 'ethers';
+import { useState } from 'react';
 import './App.css';
 
+declare global {
+  interface Window { ethereum: any }
+}
+
 function App() {
+  const [provider, setProvider] = useState<providers.Provider>()
+  const [account, setAccount] = useState('')
+
+  const connect = () => {
+    window.ethereum.request({ method: 'eth_requestAccounts' }).then((accounts: string[]) => {
+      console.log(accounts)
+      setAccount(accounts[0])
+
+      const web3Provider = new providers.Web3Provider(window.ethereum)
+      setProvider(web3Provider)
+    })
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className='connect-wallet'>
+        <button onClick={connect}>Connect wallet</button>
+        <p>Account: {account}</p>
+      </div>
+      <div className='fusion'>
+        <div className="column">
+          NFT 1
+        </div>
+        <div className="column">
+          Fusion
+        </div>
+        <div className="column">
+          NFT 2
+        </div>
+      </div>
     </div>
   );
 }
