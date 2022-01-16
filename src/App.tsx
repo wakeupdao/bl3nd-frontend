@@ -13,6 +13,7 @@ import coolcatImage from './assets/coolcat.png'
 import baycImage from './assets/bayc.png'
 import starImage from './assets/star.png'
 import podioCard from './assets/podio_card.png'
+import standardCardImage from './assets/standard_card.png'
 
 const nftFactoryAddress = '0x744568c5943a5d00d0c51ead20122631937B9715'
 const bl3ndAddress = '0x3Ab5eDd57989ea705C44f3831A9Fb6e6677b0fB2'
@@ -41,25 +42,12 @@ declare global {
   interface Window { ethereum: any }
 }
 
-const NFTRow = ({ id, owner, choose, meta }: { id: number, owner: string, choose: () => void, meta: any }) => <>
+const NFTRow = ({ id, owner, choose, meta, selected }: { id: number, owner: string, choose: () => void, meta: any, selected: boolean }) => <div className={`nft ${selected && 'nft-selected'}`}>
   <img src={meta.image} height={200} />
-  <p>Id: {id} - owner: {owner}</p>
   <p><button onClick={choose}>bl3nd me</button></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Trait type</th>
-        <th>Value</th>
-      </tr>
-    </thead>
-    <tbody>
-      {meta && meta.attributes.map((attr: any) => <tr>
-        <td>{attr.trait_type}</td>
-        <td>{attr.value}</td>
-      </tr>)}
-    </tbody>
-  </table>
-</>
+  {meta && meta.attributes.map((attr: any) => <p className='trait'><b>{attr.trait_type}</b>: {attr.value}</p>)}
+  <p>Id: {id} - owner: {shorten(owner)}</p>
+</div>
 
 type ChosenNFT = { id: number, contract: Contract }
 
@@ -69,6 +57,8 @@ const getMeta = (ids: number[], baseURI: string) => Promise.all(ids.map((id) => 
 })))
 
 const getBlends = () => JSON.parse(localStorage.getItem(blendsStorageKey) || JSON.stringify([]))
+
+const shorten = (str: string) => `${str.slice(0, 6)}...${str.slice(-4)}`
 
 function App() {
   const [signer, setSigner] = useState<Signer>()
@@ -94,8 +84,17 @@ function App() {
   const [nft1, setNFT1] = useState<ChosenNFT>()
   const [nft2, setNFT2] = useState<ChosenNFT>()
 
+  const [blending, setBlending] = useState(false)
+
+  const [approveBaycTx, setApproveBaycTx] = useState<ContractTransaction>()
+  const [approveBaycTxSuccess, setApproveBaycTxSuccess] = useState(false)
+
+  const [approveDoodlesTx, setApproveDoodlesTx] = useState<ContractTransaction>()
+  const [approveDoodlesTxSuccess, setApproveDoodlesTxSuccess] = useState(false)
+
   const [blendTx, setBlendTx] = useState<ContractTransaction>()
   const [blendTxSuccess, setBlendTxSuccess] = useState(false)
+
   const [mintedTokenId, setMintedTokenId] = useState('')
   const [mintedTokenOwner, setMintedTokenOwner] = useState('')
 
@@ -182,8 +181,18 @@ function App() {
   }
 
   const blend = async () => {
-    await nft1!.contract.approve(bl3nd!.address, nft1!.id).then((tx: ContractTransaction) => tx.wait())
-    await nft2!.contract.approve(bl3nd!.address, nft2!.id).then((tx: ContractTransaction) => tx.wait())
+    setBlending(true)
+
+    const approveBaycTx = await nft1!.contract.approve(bl3nd!.address, nft1!.id)
+    setApproveBaycTx(approveBaycTx)
+    await approveBaycTx.wait()
+    setApproveBaycTxSuccess(true)
+
+    const approveDoodlesTx = await nft2!.contract.approve(bl3nd!.address, nft2!.id)
+    setApproveDoodlesTx(approveDoodlesTx)
+    await approveDoodlesTx.wait()
+    setApproveDoodlesTxSuccess(true)
+
     const tx: ContractTransaction = await bl3nd!.blend(nft1!.contract.address, nft1!.id, nft2!.contract.address, nft2!.id)
     setBlendTx(tx)
 
@@ -202,6 +211,8 @@ function App() {
 
     await getBaycOwnersAndMeta()
     await getDoodlesOwnersAndMeta()
+
+    setBlending(false)
   }
 
   return <div className='main'>
@@ -211,7 +222,7 @@ function App() {
       </div>
       <div className='options-container'>
         <a className='github-link' href='https://github.com/wakeupdao' target='_blank'>GITHUB</a>
-        <button onClick={connect} disabled={!!signer}>{!signer ? 'Connect wallet' : `${account.slice(0, 6)}...${account.slice(-4)}`}</button>
+        <button onClick={connect} disabled={!!signer}>{!signer ? 'Connect wallet' : shorten(account)}</button>
       </div>
     </div>
     <div className='landing'>
@@ -249,31 +260,33 @@ function App() {
         <div className="column">
           <h3>BAYC NFT</h3>
           <button onClick={deployBayc} disabled={!!bayc}>deploy</button>
-          {baycDeployTx && <p>Tx: {baycDeployTx.hash}{baycDeployTxSuccess && ' success'}</p>}
-          <p>Address: {bayc && bayc.address}</p>
-          {bayc && baycIds.map((id, i) => <NFTRow key={id} id={id} owner={baycOwners[i]} choose={() => setNFT1({ id, contract: bayc! })} meta={baycMeta[i]} />)}
+          {baycDeployTx && <p>Tx: {shorten(baycDeployTx.hash)}{baycDeployTxSuccess && ' success'}</p>}
+          <p>Address: {bayc && shorten(bayc.address)}</p>
+          {bayc && baycIds.map((id, i) => <NFTRow key={id} id={id} owner={baycOwners[i]} choose={() => setNFT1({ id, contract: bayc! })} meta={baycMeta[i]} selected={nft1?.id === id} />)}
         </div>
         <div className="column">
-          <p>NFT 1: {nft1 && nft1.id}</p>
-          <p>NFT 2: {nft2 && nft2.id}</p>
-          <button disabled={!(nft1 && nft2)} onClick={blend}>Bl3nd!</button>
+          <p><button disabled={!(nft1 && nft2) || blending} onClick={blend}>Bl3nd!</button></p>
+          <p><small>(requires 3 transactions: approve both tokens + bl3nd!)</small></p>
+          {nft1 && nft2 && <img src={standardCardImage} />}
+          {approveBaycTx && <p>Approving Bayc: {shorten(approveBaycTx.hash)}{approveBaycTxSuccess && ' success!'}</p>}
+          {approveDoodlesTx && <p>Approving Doodles: {shorten(approveDoodlesTx.hash)}{approveDoodlesTxSuccess && ' success!'}</p>}
           {
             blendTx && <>
-              <p>{blendTx.hash}{blendTxSuccess && ' success! Token was minted'}</p>
-              <p>Token id: {mintedTokenId}</p>
-              <p>Token owner: {mintedTokenOwner}</p>
+              <p>Bl3nding!! {shorten(blendTx.hash)}{blendTxSuccess && ' success! Token was minted'}</p>
+              <p>Token id: {shorten(mintedTokenId)}</p>
+              <p>Token owner: {shorten(mintedTokenOwner)}</p>
             </>
           }
         </div>
         <div className="column">
           <h3>Doodles NFT</h3>
           <button onClick={deployDoodles} disabled={!!doodles}>deploy</button>
-          {doodlesDeployTx && <p>Tx: {doodlesDeployTx.hash}{doodlesDeployTxSuccess && ' success'}</p>}
-          <p>Address: {doodles && doodles.address}</p>
-          {doodles && doodlesIds.map((id, i) => <NFTRow key={id} id={id} owner={doodlesOwners[i]} choose={() => setNFT2({ id, contract: doodles! })} meta={doodlesMeta[i]} />)}
+          {doodlesDeployTx && <p>Tx: {shorten(doodlesDeployTx.hash)}{doodlesDeployTxSuccess && ' success'}</p>}
+          <p>Address: {doodles && shorten(doodles.address)}</p>
+          {doodles && doodlesIds.map((id, i) => <NFTRow key={id} id={id} owner={doodlesOwners[i]} choose={() => setNFT2({ id, contract: doodles! })} meta={doodlesMeta[i]} selected={nft2?.id === id} />)}
         </div>
       </div>
-      <div>
+      <div className='blends'>
         <h3>Bl3nd</h3>
         <p>Address: {bl3ndAddress}</p>
         <ul>

@@ -91,6 +91,7 @@ a.github-link:link, a.github-link:visited {
 
 .app {
   float: left;
+  display: block;
   width: 100%;
   position: relative;
   text-align: center;
@@ -103,4 +104,28 @@ a.github-link:link, a.github-link:visited {
 .column {
   width: 33%;
   float: left;
+}
+
+.nft {
+  border: 2px solid lightgray;
+  border-radius: 1em;
+  padding: 10px;
+  -webkit-box-shadow: 0 8px 6px -6px black;
+  -moz-box-shadow: 0 8px 6px -6px black;
+  box-shadow: 0 8px 6px -6px black;
+  margin: 20px;
+}
+
+.nft-selected {
+  background-color: #b7ff0049;
+}
+
+.trait {
+  margin: 2px;
+}
+
+.blends {
+  width: 100%;
+  float: left;
+  display: block;
 }
