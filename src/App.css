@@ -1,4 +1,88 @@
-.App {
+button {
+  background-color: #b6ff00;
+  box-shadow: none;
+  border-radius: 2em;
+  border: none;
+  font-weight: 900;
+  padding: 8px 20px;
+}
+
+button:disabled {
+  background-color: lightgrey;
+}
+
+.main {
+  width: 100%;
+  position: relative;
+}
+
+.header {
+  width: 100%;
+  height: 120px;
+  position: relative;
+  color: #232425;
+}
+
+.logo-container {
+  float: left;
+}
+
+.logo {
+  padding: 30px 180px;
+}
+
+.options-container {
+  float: right;
+  padding: 45px 180px;
+  color: inherit;
+}
+
+a.github-link:link, a.github-link:visited {
+  float: left;
+  padding: 5px 20px;
+  text-decoration: none;
+  color: inherit;
+  font-weight: 700;
+}
+
+.landing {
+  float: left;
+  height: 480px;
+  padding: 0px 180px;
+}
+
+.landing-row {
+  width: 100%;
+  float: left;
+}
+
+.landing-title {
+  font-size: 72px;
+  margin: 5px;
+  font-weight: 700;
+  float: left;
+}
+
+.landing-subtitle {
+  font-size: 22px;
+  padding-right: 80px;
+}
+
+.landing-text-container {
+  padding-top: 40px;
+  width: 60%;
+  float: left;
+}
+
+.landing-image-container {
+  width: 40%;
+  float: left;
+}
+
+.app {
+  float: left;
+  width: 100%;
+  position: relative;
   text-align: center;
 }
 

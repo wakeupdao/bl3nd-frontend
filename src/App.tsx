@@ -8,6 +8,12 @@ import bl3ndAbi from './bl3ndAbi.json'
 
 import './App.css';
 
+import logo from './assets/logo.png'
+import coolcatImage from './assets/coolcat.png'
+import baycImage from './assets/bayc.png'
+import starImage from './assets/star.png'
+import podioCard from './assets/podio_card.png'
+
 const nftFactoryAddress = '0x744568c5943a5d00d0c51ead20122631937B9715'
 const bl3ndAddress = '0x3Ab5eDd57989ea705C44f3831A9Fb6e6677b0fB2'
 
@@ -198,12 +204,37 @@ function App() {
     await getDoodlesOwnersAndMeta()
   }
 
-  return (
-    <div className="App">
-      <div className='connect-wallet'>
-        <button onClick={connect}>Connect wallet</button>
-        <p>Account: {account}</p>
+  return <div className='main'>
+    <div className='header'>
+      <div className='logo-container'>
+        <img src={logo} className='logo' />
       </div>
+      <div className='options-container'>
+        <a className='github-link' href='https://github.com/wakeupdao' target='_blank'>GITHUB</a>
+        <button onClick={connect} disabled={!!signer}>{!signer ? 'Connect wallet' : `${account.slice(0, 6)}...${account.slice(-4)}`}</button>
+      </div>
+    </div>
+    <div className='landing'>
+      <div className='landing-text-container'>
+        <div className='landing-row'>
+          <p className='landing-title'>Have —fun</p><img src={starImage} height={72} />
+        </div>
+        <div className='landing-row'>
+          <p className='landing-title'><img src={coolcatImage} height={72} /> with your</p>
+        </div>
+        <div className='landing-row'>
+          <p className='landing-title'>nft collection</p><img src={baycImage} height={92} />
+        </div>
+        <div className='landing-row'>
+          <p className='landing-subtitle'>Generate super rare NFTs by yourself, by mixing your beloved NFT collection. Let 's Bl3nd them! | by Wake Up DAO</p>
+        </div>
+      </div>
+      <div className='landing-image-container'>
+        <img src={podioCard} height={350} />
+      </div>
+    </div>
+    <div className="app">
+      <h2>Bl3nder</h2>
       <div className='fusion'>
         <div className="column">
           <h3>BAYC NFT</h3>
@@ -213,8 +244,6 @@ function App() {
           {bayc && baycIds.map((id, i) => <NFTRow key={id} id={id} owner={baycOwners[i]} choose={() => setNFT1({ id, contract: bayc! })} meta={baycMeta[i]} />)}
         </div>
         <div className="column">
-          <h2>Bl3nder</h2>
-          <p>Address: {bl3ndAddress}</p>
           <p>NFT 1: {nft1 && nft1.id}</p>
           <p>NFT 2: {nft2 && nft2.id}</p>
           <button disabled={!(nft1 && nft2)} onClick={blend}>Bl3nd!</button>
@@ -235,13 +264,14 @@ function App() {
         </div>
       </div>
       <div>
-        <h3>Bl3nds</h3>
+        <h3>Bl3nd</h3>
+        <p>Address: {bl3ndAddress}</p>
         <ul>
           {getBlends().map((blendTokenId: string) => <li key={blendTokenId}>{blendTokenId}</li>)}
         </ul>
       </div>
     </div>
-  );
+  </div>
 }
 
 export default App;
