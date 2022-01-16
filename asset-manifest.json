@@ -1,0 +1,25 @@
+{
+  "files": {
+    "main.css": "./static/css/main.13c1b66c.css",
+    "main.js": "./static/js/main.0c515cf3.js",
+    "static/js/787.57fe8352.chunk.js": "./static/js/787.57fe8352.chunk.js",
+    "static/media/podio_card.png": "./static/media/podio_card.f800fb96ae3c68d38793.png",
+    "static/media/7.png": "./static/media/7.1ddbaed1851516e1409e.png",
+    "static/media/5.png": "./static/media/5.da9288390d4194b29715.png",
+    "static/media/1.png": "./static/media/1.e8835b1161714332f137.png",
+    "static/media/8.png": "./static/media/8.a99e7837b0ef15eb102e.png",
+    "static/media/2.png": "./static/media/2.9c0cd920ff052a51ed10.png",
+    "static/media/9.png": "./static/media/9.faf111c3c91889cbf4d9.png",
+    "static/media/3.png": "./static/media/3.915c318d6ba033ccd952.png",
+    "static/media/4.png": "./static/media/4.1ac98e768f02547e4647.png",
+    "static/media/6.png": "./static/media/6.43c33a54675ef1d73d97.png",
+    "index.html": "./index.html",
+    "main.13c1b66c.css.map": "./static/css/main.13c1b66c.css.map",
+    "main.0c515cf3.js.map": "./static/js/main.0c515cf3.js.map",
+    "787.57fe8352.chunk.js.map": "./static/js/787.57fe8352.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.13c1b66c.css",
+    "static/js/main.0c515cf3.js"
+  ]
+}
