@@ -113,6 +113,9 @@ a.github-link:link, a.github-link:visited {
 }
 
 .nft {
+  min-height: 400px;
+  margin: 0 auto;
+  display: block;
   border: 2px solid lightgray;
   border-radius: 1em;
   padding: 10px;
@@ -141,7 +144,11 @@ a.github-link:link, a.github-link:visited {
 }
 
 .nft-small {
-  width: 200px;
   float: left;
   margin: 20px;
+}
+
+.nft-small > img {
+  display: block;
+  margin: 0 auto;
 }
