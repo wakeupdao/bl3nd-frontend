@@ -47,7 +47,7 @@ const NFTRow = ({ id, owner, choose, meta, selected, small }: { id: number, owne
 
   return <div className={`nft ${selected && 'nft-selected'} ${small && 'nft-small'}`}>
     <img src={meta.image} height={small ? 300 : 200} />
-    {choose && <p><button onClick={choose}>bl3nd me</button></p>}
+    {choose && <p><button className='button' onClick={choose}>bl3nd me</button></p>}
     <button className='button-link' onClick={() => setShowTraits((v) => !v)}>{showTraits ? 'hide traits' : 'show traits'}</button>
     {showTraits && meta && meta.attributes && meta.attributes.map((attr: any) => <p className='trait'><b>{attr.trait_type}</b>: {attr.value}</p>)}
     <p>Id: {id.toString().length > 10 ? shorten(id.toString()) : id.toString()} - owner: {shorten(owner)}</p>
@@ -233,7 +233,7 @@ function App() {
       </div>
       <div className='options-container'>
         <a className='github-link' href='https://github.com/wakeupdao' target='_blank'>GITHUB</a>
-        <button onClick={connect} disabled={!!signer}>{!signer ? 'Connect wallet' : shorten(account)}</button>
+        <button className='button' onClick={connect} disabled={!!signer}>{!signer ? 'Connect wallet' : shorten(account)}</button>
       </div>
     </div>
     <div className='landing'>
@@ -271,7 +271,7 @@ function App() {
       <div className='fusion'>
         <div className="column">
           <h3>BAYC NFT</h3>
-          <button onClick={deployBayc} disabled={!!bayc}>deploy</button>
+          <button onClick={deployBayc} disabled={!!bayc} className='button'>deploy sample BAYC</button>
           {baycDeployTx && <p>Tx: {shorten(baycDeployTx.hash)}{baycDeployTxSuccess && ' success'}</p>}
           <p>Address: {bayc && shorten(bayc.address)}</p>
           <div className='column-scroll'>
@@ -279,7 +279,7 @@ function App() {
           </div>
         </div>
         <div className="column">
-          <p><button disabled={!(nft1 && nft2) || blending} onClick={blend}>Bl3nd!</button></p>
+          <p><button disabled={!(nft1 && nft2) || blending} onClick={blend} className='button big-button'>Bl3nd!</button></p>
           <p><small>(requires 3 transactions: approve both tokens + bl3nd!)</small></p>
           {nft1 && nft2 && <img src={getCard(nft1.id, nft2.id)} />}
           {approveBaycTx && <p>Approving Bayc: {shorten(approveBaycTx.hash)}{approveBaycTxSuccess && ' success!'}</p>}
@@ -294,7 +294,7 @@ function App() {
         </div>
         <div className="column">
           <h3>Doodles NFT</h3>
-          <button onClick={deployDoodles} disabled={!!doodles}>deploy</button>
+          <button onClick={deployDoodles} disabled={!!doodles} className='button'>deploy sample Doodles</button>
           {doodlesDeployTx && <p>Tx: {shorten(doodlesDeployTx.hash)}{doodlesDeployTxSuccess && ' success'}</p>}
           <p>Address: {doodles && shorten(doodles.address)}</p>
           <div className='column-scroll'>
