@@ -13,7 +13,7 @@ import coolcatImage from './assets/coolcat.png'
 import baycImage from './assets/bayc.png'
 import starImage from './assets/star.png'
 import podioCard from './assets/podio_card.png'
-import standardCardImage from './assets/standard_card.png'
+import { getCard } from './cards/lib';
 
 const nftFactoryAddress = '0x1e56e8Ed6d3846076FbfB563f741d98Aa2df78Cb'
 const bl3ndAddress = '0x7f8C64C5Bac0d3Ae89eaa1F338b9d647de0e2C5a'
@@ -48,11 +48,11 @@ const NFTRow = ({ id, owner, choose, meta, selected, small }: { id: number, owne
   const [showTraits, setShowTraits] = useState(false)
 
   return <div className={`nft ${selected && 'nft-selected'} ${small && 'nft-small'}`}>
-    <img src={meta.image} height={200} />
-    {choose && <p><button onClick={choose}>bl3nd me</button></p>}
+    <img src={meta.image} height={small ? 300 : 200} />
+    {choose && <p><button className='button' onClick={choose}>bl3nd me</button></p>}
     <button className='button-link' onClick={() => setShowTraits((v) => !v)}>{showTraits ? 'hide traits' : 'show traits'}</button>
     {showTraits && meta && meta.attributes && meta.attributes.map((attr: any) => <p className='trait'><b>{attr.trait_type}</b>: {attr.value}</p>)}
-    <p>Id: {id} - owner: {shorten(owner)}</p>
+    <p>Id: {id.toString().length > 10 ? shorten(id.toString()) : id.toString()} - owner: {shorten(owner)}</p>
   </div>
 }
 
@@ -212,7 +212,11 @@ function App() {
     console.log(tokenId, to)
 
     const oldBlends = getBlends()
-    localStorage.setItem(blendsStorageKey, JSON.stringify([...oldBlends, tokenId.toHexString()]))
+    localStorage.setItem(blendsStorageKey, JSON.stringify([...oldBlends, {
+      tokenId: tokenId.toHexString(),
+      nft1TokenId: nft1!.id,
+      nft2TokenId: nft2!.id
+    }]))
 
     setMintedTokenId(tokenId.toHexString())
     setMintedTokenOwner(to)
@@ -221,6 +225,8 @@ function App() {
     await getDoodlesOwnersAndMeta()
 
     setBlending(false)
+    setNFT1(undefined)
+    setNFT2(undefined)
   }
 
   return <div className='main'>
@@ -230,7 +236,7 @@ function App() {
       </div>
       <div className='options-container'>
         <a className='github-link' href='https://github.com/wakeupdao' target='_blank'>GITHUB</a>
-        <button onClick={connect} disabled={!!signer}>{!signer ? 'Connect wallet' : shorten(account)}</button>
+        <button className='button' onClick={connect} disabled={!!signer}>{!signer ? 'Connect wallet' : shorten(account)}</button>
       </div>
     </div>
     <div className='landing'>
@@ -264,20 +270,21 @@ function App() {
     </div>
     <div className="app">
       <h2>Bl3nder</h2>
+      {!signer && <p>Please connect your wallet</p>}
       <div className='fusion'>
         <div className="column">
           <h3>BAYC NFT</h3>
-          <button onClick={deployBayc} disabled={!!bayc}>deploy</button>
-          {baycDeployTx && <p>Tx: {baycDeployTx.hash}{baycDeployTxSuccess && ' success'}</p>}
-          <p>Address: {bayc && bayc.address}</p>
+          <button onClick={deployBayc} disabled={!!bayc} className='button'>deploy sample BAYC</button>
+          {baycDeployTx && <p>Tx: {shorten(baycDeployTx.hash)}{baycDeployTxSuccess && ' success'}</p>}
+          <p>Address: {bayc && shorten(bayc.address)}</p>
           <div className='column-scroll'>
             {bayc && baycIds.map((id, i) => baycOwners[i].toLowerCase() === account ? <NFTRow key={id} id={id} owner={baycOwners[i]} choose={() => setNFT1({ id, contract: bayc! })} meta={baycMeta[i]} selected={nft1?.id === id} small={false} /> : <></>)}
           </div>
         </div>
         <div className="column">
-          <p><button disabled={!(nft1 && nft2) || blending} onClick={blend}>Bl3nd!</button></p>
+          <p><button disabled={!(nft1 && nft2) || blending} onClick={blend} className='button big-button'>Bl3nd!</button></p>
           <p><small>(requires 3 transactions: approve both tokens + bl3nd!)</small></p>
-          {nft1 && nft2 && <img src={standardCardImage} />}
+          {nft1 && nft2 && <img src={getCard(nft1.id, nft2.id)} />}
           {approveBaycTx && <p>Approving Bayc: {shorten(approveBaycTx.hash)}{approveBaycTxSuccess && ' success!'}</p>}
           {approveDoodlesTx && <p>Approving Doodles: {shorten(approveDoodlesTx.hash)}{approveDoodlesTxSuccess && ' success!'}</p>}
           {
@@ -290,9 +297,9 @@ function App() {
         </div>
         <div className="column">
           <h3>Doodles NFT</h3>
-          <button onClick={deployDoodles} disabled={!!doodles}>deploy</button>
-          {doodlesDeployTx && <p>Tx: {doodlesDeployTx.hash}{doodlesDeployTxSuccess && ' success'}</p>}
-          <p>Address: {doodles && doodles.address}</p>
+          <button onClick={deployDoodles} disabled={!!doodles} className='button'>deploy sample Doodles</button>
+          {doodlesDeployTx && <p>Tx: {shorten(doodlesDeployTx.hash)}{doodlesDeployTxSuccess && ' success'}</p>}
+          <p>Address: {doodles && shorten(doodles.address)}</p>
           <div className='column-scroll'>
             {doodles && doodlesIds.map((id, i) => doodlesOwners[i].toLowerCase() === account ? <NFTRow key={id} id={id} owner={doodlesOwners[i]} choose={() => setNFT2({ id, contract: doodles! })} meta={doodlesMeta[i]} selected={nft2?.id === id} small={false} /> : <></>)}
           </div>
@@ -300,8 +307,9 @@ function App() {
       </div>
       <div className='blends'>
         <h3>Bl3nd</h3>
-        <p>Address: {bl3ndAddress}</p>
-          {getBlends().map((blendTokenId: string) => <NFTRow key={blendTokenId} id={Number(blendTokenId)} owner={account} meta={{ image: standardCardImage }} selected={true} small={true} />)}
+        <small>Address: {bl3ndAddress}</small>
+        <p>Your bl3nds:</p>
+        {signer && getBlends().map((blendTokenIds: { tokenId: string, nft1TokenId: number, nft2TokenId: number }) => <NFTRow key={blendTokenIds.tokenId} id={Number(blendTokenIds.tokenId)} owner={account} meta={{ image: getCard(blendTokenIds.nft1TokenId, blendTokenIds.nft2TokenId) }} selected={true} small={true} />)}
       </div>
     </div>
   </div>
