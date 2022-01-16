@@ -232,6 +232,16 @@ function App() {
       <div className='landing-image-container'>
         <img src={podioCard} height={350} />
       </div>
+      <div className='description-container'>
+        <div className='description'>
+          <p><b>How it works?</b></p>
+          <p>
+            Choose two of your favorite NFTs to combine them. Once you <i>bl3nd</i> them you will mint a brand new BL3ND NFT with <b>hot new traits</b><br /><br />
+            You can always <i>unbl3nd</i> your combination until you seal it, let's start <i>bl3nding</i><br /><br />
+            You can treat your new BL3ND as a traditional NFT: transfer it, play with it, auction it!
+          </p>
+        </div>
+      </div>
     </div>
     <div className="app">
       <h2>Bl3nder</h2>

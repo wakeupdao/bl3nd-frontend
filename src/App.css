@@ -47,7 +47,7 @@ a.github-link:link, a.github-link:visited {
 
 .landing {
   float: left;
-  height: 480px;
+  height: 620px;
   padding: 0px 180px;
 }
 
@@ -77,6 +77,16 @@ a.github-link:link, a.github-link:visited {
 .landing-image-container {
   width: 40%;
   float: left;
+}
+
+.description-container {
+  width: 100%;
+  float: left;
+}
+
+.description {
+  width: 640px;
+  line-break: auto;
 }
 
 .app {
