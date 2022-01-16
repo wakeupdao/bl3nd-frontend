@@ -15,8 +15,8 @@ import starImage from './assets/star.png'
 import podioCard from './assets/podio_card.png'
 import standardCardImage from './assets/standard_card.png'
 
-const nftFactoryAddress = '0x744568c5943a5d00d0c51ead20122631937B9715'
-const bl3ndAddress = '0x3Ab5eDd57989ea705C44f3831A9Fb6e6677b0fB2'
+const nftFactoryAddress = '0x1e56e8Ed6d3846076FbfB563f741d98Aa2df78Cb'
+const bl3ndAddress = '0x7f8C64C5Bac0d3Ae89eaa1F338b9d647de0e2C5a'
 
 const baycAddressStorageKey = 'bayc-address'
 const doodlesAddressStorageKey = 'doodles-address'
@@ -28,7 +28,8 @@ const baycIds = [
   3368, // https://opensea.io/assets/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/3368
 ]
 
-const baycBaseUri = 'https://ipfs.io/ipfs/QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/'
+//const baycBaseUri = 'https://ipfs.io/ipfs/QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/'
+const baycBaseUri = 'http://localhost:5000/contracts/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/'
 
 const doodlesIds = [
   4889, // https://opensea.io/assets/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/4889
@@ -36,7 +37,8 @@ const doodlesIds = [
   2952, // https://opensea.io/assets/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/2952
 ]
 
-const doodlesBaseUri = 'https://ipfs.io/ipfs/QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS/'
+//const doodlesBaseUri = 'https://ipfs.io/ipfs/QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS/'
+const doodlesBaseUri = 'http://localhost:5000/contracts/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/'
 
 declare global {
   interface Window { ethereum: any }
@@ -58,6 +60,7 @@ type ChosenNFT = { id: number, contract: Contract }
 
 const getMeta = (ids: number[], baseURI: string) => Promise.all(ids.map((id) => axios.get(baseURI + id).then(res => res.data).then(data => {
   data.image = data.image.replace('ipfs://', 'https://ipfs.io/ipfs/')
+  console.log(data)
   return data
 })))
 
@@ -265,8 +268,8 @@ function App() {
         <div className="column">
           <h3>BAYC NFT</h3>
           <button onClick={deployBayc} disabled={!!bayc}>deploy</button>
-          {baycDeployTx && <p>Tx: {shorten(baycDeployTx.hash)}{baycDeployTxSuccess && ' success'}</p>}
-          <p>Address: {bayc && shorten(bayc.address)}</p>
+          {baycDeployTx && <p>Tx: {baycDeployTx.hash}{baycDeployTxSuccess && ' success'}</p>}
+          <p>Address: {bayc && bayc.address}</p>
           <div className='column-scroll'>
             {bayc && baycIds.map((id, i) => baycOwners[i].toLowerCase() === account ? <NFTRow key={id} id={id} owner={baycOwners[i]} choose={() => setNFT1({ id, contract: bayc! })} meta={baycMeta[i]} selected={nft1?.id === id} small={false} /> : <></>)}
           </div>
@@ -288,8 +291,8 @@ function App() {
         <div className="column">
           <h3>Doodles NFT</h3>
           <button onClick={deployDoodles} disabled={!!doodles}>deploy</button>
-          {doodlesDeployTx && <p>Tx: {shorten(doodlesDeployTx.hash)}{doodlesDeployTxSuccess && ' success'}</p>}
-          <p>Address: {doodles && shorten(doodles.address)}</p>
+          {doodlesDeployTx && <p>Tx: {doodlesDeployTx.hash}{doodlesDeployTxSuccess && ' success'}</p>}
+          <p>Address: {doodles && doodles.address}</p>
           <div className='column-scroll'>
             {doodles && doodlesIds.map((id, i) => doodlesOwners[i].toLowerCase() === account ? <NFTRow key={id} id={id} owner={doodlesOwners[i]} choose={() => setNFT2({ id, contract: doodles! })} meta={doodlesMeta[i]} selected={nft2?.id === id} small={false} /> : <></>)}
           </div>
