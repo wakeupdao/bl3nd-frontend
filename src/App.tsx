@@ -229,30 +229,30 @@ function App() {
   return <div className='main'>
     <div className='header'>
       <div className='logo-container'>
-        <img src={logo} className='logo' />
+        <img src={logo} className='logo' alt='logo' />
       </div>
       <div className='options-container'>
-        <a className='github-link' href='https://github.com/wakeupdao' target='_blank'>GITHUB</a>
+        <a className='github-link' href='https://github.com/wakeupdao' target='_blank' rel="noreferrer">GITHUB</a>
         <button className='button' onClick={connect} disabled={!!signer}>{!signer ? 'Connect wallet' : shorten(account)}</button>
       </div>
     </div>
     <div className='landing'>
       <div className='landing-text-container'>
         <div className='landing-row'>
-          <p className='landing-title'>Have —fun</p><img src={starImage} height={72} />
+          <p className='landing-title'>Have —fun</p><img src={starImage} height={72} alt='alt' />
         </div>
         <div className='landing-row'>
-          <p className='landing-title'><img src={coolcatImage} height={72} /> with your</p>
+          <p className='landing-title'><img src={coolcatImage} height={72} alt='alt' /> with your</p>
         </div>
         <div className='landing-row'>
-          <p className='landing-title'>nft collection</p><img src={baycImage} height={92} />
+          <p className='landing-title'>nft collection</p><img src={baycImage} height={92} alt='alt' />
         </div>
         <div className='landing-row'>
           <p className='landing-subtitle'>Generate super rare NFTs by yourself, by mixing your beloved NFT collection. Let 's Bl3nd them! | by Wake Up DAO</p>
         </div>
       </div>
       <div className='landing-image-container'>
-        <img src={podioCard} height={350} />
+        <img src={podioCard} height={350} alt='alt' />
       </div>
       <div className='description-container'>
         <div className='description'>
@@ -281,7 +281,7 @@ function App() {
         <div className="column">
           <p><button disabled={!(nft1 && nft2) || blending} onClick={blend} className='button big-button'>Bl3nd!</button></p>
           <p><small>(requires 3 transactions: approve both tokens + bl3nd!)</small></p>
-          {nft1 && nft2 && <img src={getCard(nft1.id, nft2.id)} />}
+          {nft1 && nft2 && <img src={getCard(nft1.id, nft2.id)} alt='alt' />}
           {approveBaycTx && <p>Approving Bayc: {shorten(approveBaycTx.hash)}{approveBaycTxSuccess && ' success!'}</p>}
           {approveDoodlesTx && <p>Approving Doodles: {shorten(approveDoodlesTx.hash)}{approveDoodlesTxSuccess && ' success!'}</p>}
           {
