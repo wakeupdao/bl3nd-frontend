@@ -15,8 +15,8 @@ import starImage from './assets/star.png'
 import podioCard from './assets/podio_card.png'
 import { getCard } from './cards/lib';
 
-const nftFactoryAddress = '0x744568c5943a5d00d0c51ead20122631937B9715'
-const bl3ndAddress = '0x3Ab5eDd57989ea705C44f3831A9Fb6e6677b0fB2'
+const nftFactoryAddress = '0xf44CD75f4613af17FFc4113070aE0D09e053382d'
+const bl3ndAddress = '0x2b6B3D35860ec0D09F441e90E65F6aCE53D7d2EF'
 
 const baycAddressStorageKey = 'bayc-address'
 const doodlesAddressStorageKey = 'doodles-address'
