@@ -46,7 +46,7 @@ const NFTRow = ({ id, owner, choose, meta, selected, small }: { id: number, owne
   const [showTraits, setShowTraits] = useState(false)
 
   return <div className={`nft ${selected && 'nft-selected'} ${small && 'nft-small'}`}>
-    <img src={meta.image} height={small ? 300 : 200} />
+    <img src={meta.image} height={small ? 300 : 200} alt='alt' />
     {choose && <p><button className='button' onClick={choose}>bl3nd me</button></p>}
     <button className='button-link' onClick={() => setShowTraits((v) => !v)}>{showTraits ? 'hide traits' : 'show traits'}</button>
     {showTraits && meta && meta.attributes && meta.attributes.map((attr: any) => <p className='trait'><b>{attr.trait_type}</b>: {attr.value}</p>)}
