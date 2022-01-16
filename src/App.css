@@ -92,7 +92,8 @@ a.github-link:link, a.github-link:visited {
 .app {
   float: left;
   display: block;
-  width: 100%;
+  padding: 0px 60px;
+  width: calc(100% - 120px);
   position: relative;
   text-align: center;
 }
@@ -106,6 +107,11 @@ a.github-link:link, a.github-link:visited {
   float: left;
 }
 
+.column-scroll {
+  max-height: 800px;
+  overflow-y: scroll;
+}
+
 .nft {
   border: 2px solid lightgray;
   border-radius: 1em;
@@ -113,7 +119,7 @@ a.github-link:link, a.github-link:visited {
   -webkit-box-shadow: 0 8px 6px -6px black;
   -moz-box-shadow: 0 8px 6px -6px black;
   box-shadow: 0 8px 6px -6px black;
-  margin: 20px;
+  margin: 10px 60px;
 }
 
 .nft-selected {
@@ -128,4 +134,14 @@ a.github-link:link, a.github-link:visited {
   width: 100%;
   float: left;
   display: block;
+}
+
+.button-link {
+  background-color: transparent;
+}
+
+.nft-small {
+  width: 200px;
+  float: left;
+  margin: 20px;
 }
