@@ -15,8 +15,9 @@ import starImage from './assets/star.png'
 import podioCard from './assets/podio_card.png'
 import { getCard } from './cards/lib';
 
-const nftFactoryAddress = '0x1e56e8Ed6d3846076FbfB563f741d98Aa2df78Cb'
-const bl3ndAddress = '0x7f8C64C5Bac0d3Ae89eaa1F338b9d647de0e2C5a'
+const nftFactoryAddress = '0x2FC2fdc05bdEa93297d572599E156D43531a6768'
+const bl3ndAddress = '0x63Cd2E816Fc29B42B993F8cA7283e528F29484F9'
+// crypt: 0xde2f9074F2A2b820B532F34c36e58f0233B655A5
 
 const baycAddressStorageKey = 'bayc-address'
 const doodlesAddressStorageKey = 'doodles-address'
@@ -28,8 +29,8 @@ const baycIds = [
   3368, // https://opensea.io/assets/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/3368
 ]
 
-//const baycBaseUri = 'https://ipfs.io/ipfs/QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/'
-const baycBaseUri = 'http://localhost:5000/contracts/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/'
+const baycBaseUri = 'https://ipfs.io/ipfs/QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/'
+// const baycBaseUri = 'http://localhost:5000/contracts/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/'
 
 const doodlesIds = [
   4889, // https://opensea.io/assets/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/4889
@@ -37,8 +38,8 @@ const doodlesIds = [
   2952, // https://opensea.io/assets/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/2952
 ]
 
-//const doodlesBaseUri = 'https://ipfs.io/ipfs/QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS/'
-const doodlesBaseUri = 'http://localhost:5000/contracts/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/'
+const doodlesBaseUri = 'https://ipfs.io/ipfs/QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS/'
+// const doodlesBaseUri = 'http://localhost:5000/contracts/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/'
 
 declare global {
   interface Window { ethereum: any }
@@ -229,6 +230,13 @@ function App() {
     setNFT2(undefined)
   }
 
+  const reset = () => {
+    localStorage.removeItem(baycAddressStorageKey)
+    localStorage.removeItem(doodlesAddressStorageKey)
+    localStorage.removeItem(blendsStorageKey)
+    window.location.reload()
+  }
+
   return <div className='main'>
     <div className='header'>
       <div className='logo-container'>
@@ -311,6 +319,9 @@ function App() {
         <p>Your bl3nds:</p>
         {signer && getBlends().map((blendTokenIds: { tokenId: string, nft1TokenId: number, nft2TokenId: number }) => <NFTRow key={blendTokenIds.tokenId} id={Number(blendTokenIds.tokenId)} owner={account} meta={{ image: getCard(blendTokenIds.nft1TokenId, blendTokenIds.nft2TokenId) }} selected={true} small={true} />)}
       </div>
+    </div>
+    <div>
+      <button onClick={reset}>reset</button>
     </div>
   </div>
 }
