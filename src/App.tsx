@@ -243,7 +243,7 @@ function App() {
         <img src={logo} className='logo' alt='logo' />
       </div>
       <div className='options-container'>
-        <a className='github-link' href='https://github.com/wakeupdao' target='_blank'>GITHUB</a>
+        <a className='github-link' href='https://github.com/wakeupdao' target='_blank' rel='noreferrer'>GITHUB</a>
         <button className='button' onClick={connect} disabled={!!signer}>{!signer ? 'Connect wallet' : shorten(account)}</button>
       </div>
     </div>
