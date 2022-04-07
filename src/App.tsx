@@ -15,8 +15,9 @@ import starImage from './assets/star.png'
 import podioCard from './assets/podio_card.png'
 import { getCard } from './cards/lib';
 
-const nftFactoryAddress = '0x1e56e8Ed6d3846076FbfB563f741d98Aa2df78Cb'
-const bl3ndAddress = '0x7f8C64C5Bac0d3Ae89eaa1F338b9d647de0e2C5a'
+const nftFactoryAddress = '0x2FC2fdc05bdEa93297d572599E156D43531a6768'
+const bl3ndAddress = '0x63Cd2E816Fc29B42B993F8cA7283e528F29484F9'
+// crypt: 0xde2f9074F2A2b820B532F34c36e58f0233B655A5
 
 const baycAddressStorageKey = 'bayc-address'
 const doodlesAddressStorageKey = 'doodles-address'
@@ -28,8 +29,8 @@ const baycIds = [
   3368, // https://opensea.io/assets/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/3368
 ]
 
-//const baycBaseUri = 'https://ipfs.io/ipfs/QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/'
-const baycBaseUri = 'http://localhost:5000/contracts/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/'
+const baycBaseUri = 'https://ipfs.io/ipfs/QmeSjSinHpPnmXmspMjwiXyN6zS4E9zccariGR3jxcaWtq/'
+// const baycBaseUri = 'http://localhost:5000/contracts/0xbc4ca0eda7647a8ab7c2061c2e118a18a936f13d/'
 
 const doodlesIds = [
   4889, // https://opensea.io/assets/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/4889
@@ -37,8 +38,8 @@ const doodlesIds = [
   2952, // https://opensea.io/assets/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/2952
 ]
 
-//const doodlesBaseUri = 'https://ipfs.io/ipfs/QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS/'
-const doodlesBaseUri = 'http://localhost:5000/contracts/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/'
+const doodlesBaseUri = 'https://ipfs.io/ipfs/QmPMc4tcBsMqLRuCQtPmPe84bpSjrC3Ky7t3JWuHXYB4aS/'
+// const doodlesBaseUri = 'http://localhost:5000/contracts/0x8a90cab2b38dba80c64b7734e58ee1db38b8992e/'
 
 declare global {
   interface Window { ethereum: any }
@@ -48,7 +49,7 @@ const NFTRow = ({ id, owner, choose, meta, selected, small }: { id: number, owne
   const [showTraits, setShowTraits] = useState(false)
 
   return <div className={`nft ${selected && 'nft-selected'} ${small && 'nft-small'}`}>
-    <img src={meta.image} height={small ? 300 : 200} />
+    <img src={meta.image} height={small ? 300 : 200} alt={meta.image} />
     {choose && <p><button className='button' onClick={choose}>bl3nd me</button></p>}
     <button className='button-link' onClick={() => setShowTraits((v) => !v)}>{showTraits ? 'hide traits' : 'show traits'}</button>
     {showTraits && meta && meta.attributes && meta.attributes.map((attr: any) => <p className='trait'><b>{attr.trait_type}</b>: {attr.value}</p>)}
@@ -229,33 +230,40 @@ function App() {
     setNFT2(undefined)
   }
 
+  const reset = () => {
+    localStorage.removeItem(baycAddressStorageKey)
+    localStorage.removeItem(doodlesAddressStorageKey)
+    localStorage.removeItem(blendsStorageKey)
+    window.location.reload()
+  }
+
   return <div className='main'>
     <div className='header'>
       <div className='logo-container'>
-        <img src={logo} className='logo' />
+        <img src={logo} className='logo' alt='logo' />
       </div>
       <div className='options-container'>
-        <a className='github-link' href='https://github.com/wakeupdao' target='_blank'>GITHUB</a>
+        <a className='github-link' href='https://github.com/wakeupdao' target='_blank' rel='noreferrer'>GITHUB</a>
         <button className='button' onClick={connect} disabled={!!signer}>{!signer ? 'Connect wallet' : shorten(account)}</button>
       </div>
     </div>
     <div className='landing'>
       <div className='landing-text-container'>
         <div className='landing-row'>
-          <p className='landing-title'>Have —fun</p><img src={starImage} height={72} />
+          <p className='landing-title'>Have —fun</p><img src={starImage} height={72} alt='start' />
         </div>
         <div className='landing-row'>
-          <p className='landing-title'><img src={coolcatImage} height={72} /> with your</p>
+          <p className='landing-title'><img src={coolcatImage} height={72} alt='coolcat' /> with your</p>
         </div>
         <div className='landing-row'>
-          <p className='landing-title'>nft collection</p><img src={baycImage} height={92} />
+          <p className='landing-title'>nft collection</p><img src={baycImage} alt='bayc' height={92} />
         </div>
         <div className='landing-row'>
           <p className='landing-subtitle'>Generate super rare NFTs by yourself, by mixing your beloved NFT collection. Let 's Bl3nd them! | by Wake Up DAO</p>
         </div>
       </div>
       <div className='landing-image-container'>
-        <img src={podioCard} height={350} />
+        <img src={podioCard} height={350} alt='podio' />
       </div>
       <div className='description-container'>
         <div className='description'>
@@ -284,7 +292,7 @@ function App() {
         <div className="column">
           <p><button disabled={!(nft1 && nft2) || blending} onClick={blend} className='button big-button'>Bl3nd!</button></p>
           <p><small>(requires 3 transactions: approve both tokens + bl3nd!)</small></p>
-          {nft1 && nft2 && <img src={getCard(nft1.id, nft2.id)} />}
+          {nft1 && nft2 && <img src={getCard(nft1.id, nft2.id)} alt={`card-${nft1.id}-${nft2.id}`} />}
           {approveBaycTx && <p>Approving Bayc: {shorten(approveBaycTx.hash)}{approveBaycTxSuccess && ' success!'}</p>}
           {approveDoodlesTx && <p>Approving Doodles: {shorten(approveDoodlesTx.hash)}{approveDoodlesTxSuccess && ' success!'}</p>}
           {
@@ -311,6 +319,9 @@ function App() {
         <p>Your bl3nds:</p>
         {signer && getBlends().map((blendTokenIds: { tokenId: string, nft1TokenId: number, nft2TokenId: number }) => <NFTRow key={blendTokenIds.tokenId} id={Number(blendTokenIds.tokenId)} owner={account} meta={{ image: getCard(blendTokenIds.nft1TokenId, blendTokenIds.nft2TokenId) }} selected={true} small={true} />)}
       </div>
+    </div>
+    <div>
+      <button onClick={reset}>reset</button>
     </div>
   </div>
 }
