@@ -49,7 +49,7 @@ const NFTRow = ({ id, owner, choose, meta, selected, small }: { id: number, owne
   const [showTraits, setShowTraits] = useState(false)
 
   return <div className={`nft ${selected && 'nft-selected'} ${small && 'nft-small'}`}>
-    <img src={meta.image} height={small ? 300 : 200} />
+    <img src={meta.image} height={small ? 300 : 200} alt={meta.image} />
     {choose && <p><button className='button' onClick={choose}>bl3nd me</button></p>}
     <button className='button-link' onClick={() => setShowTraits((v) => !v)}>{showTraits ? 'hide traits' : 'show traits'}</button>
     {showTraits && meta && meta.attributes && meta.attributes.map((attr: any) => <p className='trait'><b>{attr.trait_type}</b>: {attr.value}</p>)}
@@ -240,7 +240,7 @@ function App() {
   return <div className='main'>
     <div className='header'>
       <div className='logo-container'>
-        <img src={logo} className='logo' />
+        <img src={logo} className='logo' alt='logo' />
       </div>
       <div className='options-container'>
         <a className='github-link' href='https://github.com/wakeupdao' target='_blank'>GITHUB</a>
@@ -250,20 +250,20 @@ function App() {
     <div className='landing'>
       <div className='landing-text-container'>
         <div className='landing-row'>
-          <p className='landing-title'>Have —fun</p><img src={starImage} height={72} />
+          <p className='landing-title'>Have —fun</p><img src={starImage} height={72} alt='start' />
         </div>
         <div className='landing-row'>
-          <p className='landing-title'><img src={coolcatImage} height={72} /> with your</p>
+          <p className='landing-title'><img src={coolcatImage} height={72} alt='coolcat' /> with your</p>
         </div>
         <div className='landing-row'>
-          <p className='landing-title'>nft collection</p><img src={baycImage} height={92} />
+          <p className='landing-title'>nft collection</p><img src={baycImage} alt='bayc' height={92} />
         </div>
         <div className='landing-row'>
           <p className='landing-subtitle'>Generate super rare NFTs by yourself, by mixing your beloved NFT collection. Let 's Bl3nd them! | by Wake Up DAO</p>
         </div>
       </div>
       <div className='landing-image-container'>
-        <img src={podioCard} height={350} />
+        <img src={podioCard} height={350} alt='podio' />
       </div>
       <div className='description-container'>
         <div className='description'>
@@ -292,7 +292,7 @@ function App() {
         <div className="column">
           <p><button disabled={!(nft1 && nft2) || blending} onClick={blend} className='button big-button'>Bl3nd!</button></p>
           <p><small>(requires 3 transactions: approve both tokens + bl3nd!)</small></p>
-          {nft1 && nft2 && <img src={getCard(nft1.id, nft2.id)} />}
+          {nft1 && nft2 && <img src={getCard(nft1.id, nft2.id)} alt={`card-${nft1.id}-${nft2.id}`} />}
           {approveBaycTx && <p>Approving Bayc: {shorten(approveBaycTx.hash)}{approveBaycTxSuccess && ' success!'}</p>}
           {approveDoodlesTx && <p>Approving Doodles: {shorten(approveDoodlesTx.hash)}{approveDoodlesTxSuccess && ' success!'}</p>}
           {
