@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "./static/css/main.13c1b66c.css",
-    "main.js": "./static/js/main.08ea8e37.js",
+    "main.js": "./static/js/main.3aca468b.js",
     "static/js/787.57fe8352.chunk.js": "./static/js/787.57fe8352.chunk.js",
     "static/media/podio_card.png": "./static/media/podio_card.f800fb96ae3c68d38793.png",
     "static/media/7.png": "./static/media/7.1ddbaed1851516e1409e.png",
@@ -15,11 +15,11 @@
     "static/media/6.png": "./static/media/6.43c33a54675ef1d73d97.png",
     "index.html": "./index.html",
     "main.13c1b66c.css.map": "./static/css/main.13c1b66c.css.map",
-    "main.08ea8e37.js.map": "./static/js/main.08ea8e37.js.map",
+    "main.3aca468b.js.map": "./static/js/main.3aca468b.js.map",
     "787.57fe8352.chunk.js.map": "./static/js/787.57fe8352.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.13c1b66c.css",
-    "static/js/main.08ea8e37.js"
+    "static/js/main.3aca468b.js"
   ]
 }
